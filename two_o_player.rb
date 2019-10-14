@@ -1,9 +1,8 @@
 class Player
-  attr_accessor :lives, :turn, :name
-  def initialize(lives, turn, name)
+  attr_accessor :lives, :name
+  def initialize(lives, name)
     @name = name
     @lives = lives
-    @turn = turn
   end
 
   def deduct()
@@ -15,11 +14,10 @@ end
 class Game
   attr_accessor :p1, :p2, :random1, :random2
   def initialize()
-    @p1 = Player.new(3, true, "Player 1")
-    @p2 = Player.new(3, false, "Player 2")
+    @p1 = Player.new(3, "Player 1")
+    @p2 = Player.new(3, "Player 2")
     @random1 = 0
     @random2 = 0
-
   end
 
   def genQuestions()
@@ -35,14 +33,7 @@ class Game
       "Seriously? No!"
     end
   end
-  #decide which turn to answer
-  def getTurn()
-    if p1.turn
-      p1
-    else
-      p2
-    end
-  end
+
   def checkScore(current)
     if current.lives == 0
       if current.name == "Player 1"
@@ -51,17 +42,29 @@ class Game
         "#{p1.name} wins with a score of #{p1.lives}/3"
       end
     else 
-      "P1: #{p1.lives} vs #{p2.lives} "
+      "P1: #{p1.lives}/3 vs P2: #{p2.lives}/3 "
+    end
+  end
+  def changeTurn(current)
+    if current.name == "Player 1"
+      return p2
+    else
+      return p1
     end
   end
   def run()
-    current = getTurn
-    puts "#{current.name}: #{genQuestions}"
-    print " >"
-    ans = $stdin.gets.chomp
-    puts "#{current.name}: #{checkAnswer(current, ans)}"
-    puts "#{current.lives}"
-
+    current = p1
+    while (p1.lives != 0 && p2.lives != 0)
+      puts "----- NEW TURN -----"
+      puts "#{current.name}: #{genQuestions}"
+      print "> "
+      ans = $stdin.gets.chomp
+      puts "#{current.name}: #{checkAnswer(current, ans)}"
+      puts checkScore(current)
+      current = changeTurn(current)
+    end
+    puts "----- GAME OVER -----"
+    puts "Good bye!"
   end
 end
 game = Game.new
